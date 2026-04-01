@@ -9,6 +9,7 @@ Unlike typical algorithm puzzle sites, these challenges focus on building real-w
 | Challenge | Description | Language | Status |
 | --------- | ----------- | -------- | ------ |
 | [ccwc](ccwc/) | Unix `wc` tool clone | Rust | Done |
+| [parsin](parsin/) | JSON parser | Rust | Done |
 
 ---
 
@@ -23,3 +24,4 @@ Diferente dos sites tradicionais de algoritmos, esses desafios focam em construi
 | Desafio | Descrição | Linguagem | Status |
 | ------- | --------- | --------- | ------ |
 | [ccwc](ccwc/) | Clone da ferramenta Unix `wc` | Rust | Concluído |
+| [parsin](parsin/) | Parser de JSON | Rust | Concluído |
