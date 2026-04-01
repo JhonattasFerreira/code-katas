@@ -38,6 +38,5 @@ Exit code `0` = valid JSON, exit code `1` = invalid JSON.
 |------|-------------|--------|
 | 1 | Parse `{}` as valid and empty input as invalid | Done |
 | 2 | Support string keys and string values: `{"key": "value"}` | Done |
-| 3 | Support boolean, null and numeric values | Pending |
-| 4 | Support nested objects and arrays | Pending |
-| 5 | Add custom tests and validate against the full JSON test suite | Pending |
+| 3 | Support boolean, null and numeric values | Done |
+| 4 | Support nested objects and arrays | Done |

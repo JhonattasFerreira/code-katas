@@ -54,6 +54,38 @@ mod tests {
         assert!(run(&input).is_err());
     }
 
+    // step3 files
+    #[test]
+    fn test_step3_valid() {
+        let input = std::fs::read_to_string("tests/step3/valid.json").unwrap();
+        assert_eq!(run(&input), Ok(()));
+    }
+
+    #[test]
+    fn test_step3_invalid() {
+        let input = std::fs::read_to_string("tests/step3/invalid.json").unwrap();
+        assert!(run(&input).is_err());
+    }
+
+    // step4 files
+    #[test]
+    fn test_step4_valid() {
+        let input = std::fs::read_to_string("tests/step4/valid.json").unwrap();
+        assert_eq!(run(&input), Ok(()));
+    }
+
+    #[test]
+    fn test_step4_valid2() {
+        let input = std::fs::read_to_string("tests/step4/valid2.json").unwrap();
+        assert_eq!(run(&input), Ok(()));
+    }
+
+    #[test]
+    fn test_step4_invalid() {
+        let input = std::fs::read_to_string("tests/step4/invalid.json").unwrap();
+        assert!(run(&input).is_err());
+    }
+
     // step2 files
     #[test]
     fn test_step2_valid() {
