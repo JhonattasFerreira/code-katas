@@ -1,0 +1,14 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug ccwc (test.txt)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/target/debug/ccwc",
+            "args": ["test.txt"],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "cargo build"
+        }
+    ]
+}
