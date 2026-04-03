@@ -1,28 +1,42 @@
 use crate::{bits::BitReader, tree};
 
-pub fn decode(compressed: &[u8]) -> Vec<u8> {
+pub fn decode(compressed: &[u8]) -> Result<Vec<u8>, String> {
+    if compressed.len() < 10 {
+        return Err("compressed data is too short to contain a valid header".to_string());
+    }
+
     // read original size (8 bytes)
-    let original_size = u64::from_le_bytes(compressed[0..8].try_into().unwrap()) as usize;
+    let original_size =
+        u64::from_le_bytes(compressed[0..8].try_into().map_err(|_| "failed to read original size")?) as usize;
 
     // read entry count (2 bytes)
-    let n_entries = u16::from_le_bytes(compressed[8..10].try_into().unwrap()) as usize;
+    let n_entries =
+        u16::from_le_bytes(compressed[8..10].try_into().map_err(|_| "failed to read entry count")?) as usize;
+
+    let header_end = 10 + n_entries * 9;
+    if compressed.len() < header_end {
+        return Err("compressed data is too short to contain all header entries".to_string());
+    }
 
     // read (byte, freq) pairs and reconstruct frequency table
     let mut freq = [0u64; 256];
     for i in 0..n_entries {
         let offset = 10 + i * 9;
         let byte = compressed[offset] as usize;
-        let f = u64::from_le_bytes(compressed[offset + 1..offset + 9].try_into().unwrap());
+        let f = u64::from_le_bytes(
+            compressed[offset + 1..offset + 9]
+                .try_into()
+                .map_err(|_| "failed to read frequency entry")?,
+        );
         freq[byte] = f;
     }
 
-    let data_start = 10 + n_entries * 9;
-    let data = &compressed[data_start..];
+    let data = &compressed[header_end..];
 
     // edge case: single distinct byte — no bits were written
     if n_entries == 1 {
         let byte = compressed[10];
-        return vec![byte; original_size];
+        return Ok(vec![byte; original_size]);
     }
 
     // rebuild tree and decode bits
@@ -37,17 +51,15 @@ pub fn decode(compressed: &[u8]) -> Vec<u8> {
                 out.push(*byte);
                 node = &root;
             }
-            tree::HuffNode::Internal { left, right, .. } => {
-                match reader.read_bit() {
-                    Some(false) => node = left,
-                    Some(true) => node = right,
-                    None => break,
-                }
-            }
+            tree::HuffNode::Internal { left, right, .. } => match reader.read_bit() {
+                Some(false) => node = left,
+                Some(true) => node = right,
+                None => break,
+            },
         }
     }
 
-    out
+    Ok(out)
 }
 
 #[cfg(test)]
@@ -60,7 +72,7 @@ mod tests {
     fn test_round_trip_short_string() {
         let data = b"hello world";
         let compressed = encoder::encode(data);
-        let result = decode(&compressed);
+        let result = decode(&compressed).expect("decode failed");
         assert_eq!(result, data);
     }
 
@@ -69,7 +81,7 @@ mod tests {
     fn test_round_trip_single_byte() {
         let data = b"aaaaaaa";
         let compressed = encoder::encode(data);
-        let result = decode(&compressed);
+        let result = decode(&compressed).expect("decode failed");
         assert_eq!(result, data);
     }
 
@@ -78,7 +90,7 @@ mod tests {
     fn test_round_trip_two_bytes() {
         let data = b"ababab";
         let compressed = encoder::encode(data);
-        let result = decode(&compressed);
+        let result = decode(&compressed).expect("decode failed");
         assert_eq!(result, data);
     }
 
@@ -87,7 +99,7 @@ mod tests {
     fn test_round_trip_all_256_bytes() {
         let data: Vec<u8> = (0..=255u8).collect();
         let compressed = encoder::encode(&data);
-        let result = decode(&compressed);
+        let result = decode(&compressed).expect("decode failed");
         assert_eq!(result, data);
     }
 
@@ -97,7 +109,13 @@ mod tests {
         let mut data = vec![b'a'; 1000];
         data.push(b'b');
         let compressed = encoder::encode(&data);
-        let result = decode(&compressed);
+        let result = decode(&compressed).expect("decode failed");
         assert_eq!(result, data);
+    }
+
+    // invalid input returns an error
+    #[test]
+    fn test_invalid_input_returns_error() {
+        assert!(decode(&[0u8; 3]).is_err());
     }
 }

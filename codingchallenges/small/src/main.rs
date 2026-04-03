@@ -29,7 +29,13 @@ fn main() {
 
     let result = match parsed.command {
         cli::Command::Compress => encoder::encode(&data),
-        cli::Command::Decompress => decoder::decode(&data),
+        cli::Command::Decompress => match decoder::decode(&data) {
+            Ok(bytes) => bytes,
+            Err(e) => {
+                eprintln!("Error: {}", e);
+                std::process::exit(1);
+            }
+        },
     };
 
     if let Err(e) = fs::write(&parsed.output, &result) {
