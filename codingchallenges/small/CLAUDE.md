@@ -8,6 +8,12 @@ The test file is `test.txt` — the complete Les Misérables book. **Do not open
 
 ---
 
+## Environment
+
+- `cargo` is not in the default shell PATH. Always use the full path: `~/.cargo/bin/cargo`
+
+---
+
 ## Development approach
 
 - **TDD**: always write tests before implementation. Only implement after tests exist and are failing.
@@ -41,7 +47,7 @@ src/
 ├── cli.rs         — argument parsing (parse_args)
 ├── frequency.rs   — byte frequency counting
 ├── tree.rs        — HuffNode, tree construction
-├── table.rs       — prefix-code table generation (TODO)
+├── table.rs       — prefix-code table generation
 ├── bits.rs        — BitWriter and BitReader (TODO)
 ├── encoder.rs     — compression: header + data (TODO)
 └── decoder.rs     — decompression (TODO)
@@ -81,42 +87,19 @@ src/
 - Construction algorithm: insert all non-zero bytes as leaves, repeatedly pop two lowest-freq nodes, merge into an Internal node, reinsert, until one node remains
 - 6 tests passing, covering: single byte produces leaf root, two bytes produces internal root with freq=sum, OpenDSA example root freq=306, zero-freq bytes ignored, high-freq chars have lower depth than low-freq, all non-zero bytes reachable
 
-### Total tests: 23 passing, 0 failing
+**`table.rs`** — `pub fn build_table(root: &HuffNode) -> [Option<Vec<bool>>; 256]`
+
+- Receives the Huffman tree root and returns a 256-slot array; index = byte value; value = `Some(code)` if the byte exists in the tree, `None` otherwise
+- `Vec<bool>` represents the bit sequence: `false` = left (0), `true` = right (1)
+- Implemented as a recursive DFS via private `traverse` function, accumulating the path down to each leaf
+- Edge case: a single symbol produces an empty code `Some(vec![])` — no bits needed
+- 6 tests passing, covering: single byte with empty code, two bytes with 1-bit codes, high-frequency byte gets shorter code, all present bytes have `Some`, absent bytes have `None`, prefix-free property
+
+### Total tests: 29 passing, 0 failing
 
 ---
 
-## Next step: Step 3 — Prefix-code table (`table.rs`)
-
-### What needs to be done
-
-Traverse the Huffman tree and generate a mapping from each byte to its binary code.
-
-### Design decisions
-
-- Function signature: `pub fn build_table(root: &HuffNode) -> [Option<Vec<bool>>; 256]`
-  - Returns an array of 256 slots; index = byte value; value = `Some(code)` if the byte exists in the tree, `None` otherwise
-  - `Vec<bool>` represents the bit sequence: `false` = left (0), `true` = right (1)
-- Algorithm: DFS traversal of the tree, tracking the path taken; when a leaf is reached, store the accumulated path as the code for that byte
-
-### How to validate
-
-Using the OpenDSA example (C=32, D=42, E=120, K=7, L=42, M=24, U=37, Z=2):
-
-- E (freq=120) should have the shortest code (1 bit)
-- Z (freq=2) and K (freq=7) should have the longest codes (5-6 bits)
-- All codes must be prefix-free: no code is a prefix of another
-- Encoding and decoding a known string must round-trip correctly
-
-### TDD approach
-
-Write tests first in `table.rs`, then implement. Suggested tests:
-
-- Single byte: code is empty (no bits needed — only one symbol)
-- Two bytes: one gets `[false]`, the other `[true]`
-- Higher frequency byte gets shorter code than lower frequency byte (OpenDSA data)
-- All bytes present in the tree have a non-None entry
-- Bytes absent from the tree have a None entry
-- Prefix-free property: no code in the table is a prefix of another
+## Next step: Step 4 — BitWriter and BitReader (`bits.rs`)
 
 ---
 
