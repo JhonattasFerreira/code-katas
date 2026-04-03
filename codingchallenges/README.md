@@ -10,6 +10,7 @@ Unlike typical algorithm puzzle sites, these challenges focus on building real-w
 | --------- | ----------- | -------- | ------ |
 | [ccwc](ccwc/) | Unix `wc` tool clone | Rust | Done |
 | [parsin](parsin/) | JSON parser | Rust | Done |
+| [small](small/) | Huffman compression tool | Rust | Done |
 
 ---
 
@@ -25,3 +26,4 @@ Diferente dos sites tradicionais de algoritmos, esses desafios focam em construi
 | ------- | --------- | --------- | ------ |
 | [ccwc](ccwc/) | Clone da ferramenta Unix `wc` | Rust | Concluído |
 | [parsin](parsin/) | Parser de JSON | Rust | Concluído |
+| [small](small/) | Ferramenta de compressão Huffman | Rust | Concluído |
