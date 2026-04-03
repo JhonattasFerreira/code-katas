@@ -48,7 +48,7 @@ src/
 ├── frequency.rs   — byte frequency counting
 ├── tree.rs        — HuffNode, tree construction
 ├── table.rs       — prefix-code table generation
-├── bits.rs        — BitWriter and BitReader (TODO)
+├── bits.rs        — BitWriter and BitReader
 ├── encoder.rs     — compression: header + data (TODO)
 └── decoder.rs     — decompression (TODO)
 ```
@@ -95,11 +95,20 @@ src/
 - Edge case: a single symbol produces an empty code `Some(vec![])` — no bits needed
 - 6 tests passing, covering: single byte with empty code, two bytes with 1-bit codes, high-frequency byte gets shorter code, all present bytes have `Some`, absent bytes have `None`, prefix-free property
 
-### Total tests: 29 passing, 0 failing
+**`bits.rs`** — `BitWriter` and `BitReader`
+
+- `BitWriter::new()`, `write_bit(&mut self, bit: bool)`, `finish(self) -> Vec<u8>`
+  - Packs bits into bytes MSB first; partial last byte is zero-padded on the right
+- `BitReader::new(data: &[u8])`, `read_bit(&mut self) -> Option<bool>`
+  - Reads bits MSB first; returns `None` when exhausted
+- No padding metadata returned — the encoder stores the original file size in the header; the decoder stops by byte count, not bit count
+- 9 tests passing, covering: empty writer, 8-bit flush, MSB-first order, partial byte padding, 16-bit output, empty reader, MSB-first reading, exhaustion, round-trip
+
+### Total tests: 38 passing, 0 failing
 
 ---
 
-## Next step: Step 4 — BitWriter and BitReader (`bits.rs`)
+## Next step: Step 5 — Encoder (`encoder.rs`)
 
 ---
 

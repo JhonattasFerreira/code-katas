@@ -1,3 +1,4 @@
+mod bits;
 mod cli;
 mod frequency;
 mod table;
