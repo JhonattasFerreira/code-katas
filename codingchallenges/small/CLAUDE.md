@@ -19,14 +19,14 @@ The test file is `test.txt` — the complete Les Misérables book. **Do not open
 
 ## CLI interface
 
-```
+```sh
 ccli compress <input> -o <output>
 ccli decompress <input> -o <output>
 ```
 
 Examples:
 
-```
+```sh
 ccli compress test.txt -o test.huff
 ccli decompress test.huff -o result.txt
 ```
@@ -35,12 +35,12 @@ ccli decompress test.huff -o result.txt
 
 ## Module structure
 
-```
+```text
 src/
 ├── main.rs        — entry point, CLI wiring, file reading
 ├── cli.rs         — argument parsing (parse_args)
 ├── frequency.rs   — byte frequency counting
-├── tree.rs        — HuffNode, tree construction (TODO)
+├── tree.rs        — HuffNode, tree construction
 ├── table.rs       — prefix-code table generation (TODO)
 ├── bits.rs        — BitWriter and BitReader (TODO)
 ├── encoder.rs     — compression: header + data (TODO)
@@ -71,69 +71,52 @@ src/
 - Collects `std::env::args`, calls `parse_args`, reads the file with `fs::read`, calls `frequency::count`, prints the frequency table (ASCII graphic characters shown as `'x'`, others as `0xHH`)
 - Errors are printed to `stderr` with `eprintln!` and exit with code 1
 
-### Total tests: 17 passing, 0 failing
+**`tree.rs`** — `pub fn build_tree(freq: &[u64; 256]) -> HuffNode`
+
+- `HuffNode` is a recursive enum with two variants:
+  - `Leaf { byte: u8, freq: u64 }` — represents a single character
+  - `Internal { freq: u64, left: Box<HuffNode>, right: Box<HuffNode> }` — internal node
+- `HuffNode::freq()` returns the frequency of any node
+- Uses `BinaryHeap<Reverse<HeapEntry>>` internally as a min-heap (HeapEntry is a private wrapper that implements `Ord` by frequency only)
+- Construction algorithm: insert all non-zero bytes as leaves, repeatedly pop two lowest-freq nodes, merge into an Internal node, reinsert, until one node remains
+- 6 tests passing, covering: single byte produces leaf root, two bytes produces internal root with freq=sum, OpenDSA example root freq=306, zero-freq bytes ignored, high-freq chars have lower depth than low-freq, all non-zero bytes reachable
+
+### Total tests: 23 passing, 0 failing
 
 ---
 
-## Next step: Step 2 — Huffman Tree (`tree.rs`)
+## Next step: Step 3 — Prefix-code table (`table.rs`)
 
 ### What needs to be done
 
-Build the Huffman tree from the `[u64; 256]` returned by `frequency::count`.
+Traverse the Huffman tree and generate a mapping from each byte to its binary code.
 
-### Design decisions already agreed upon
+### Design decisions
 
-**Node representation — recursive enum:**
-
-```rust
-enum HuffNode {
-    Leaf { byte: u8, freq: u64 },
-    Internal { freq: u64, left: Box<HuffNode>, right: Box<HuffNode> },
-}
-```
-
-**Priority queue — stdlib `BinaryHeap` with `Reverse`:**
-
-- `BinaryHeap` is a max-heap by default
-- Wrapping with `std::cmp::Reverse` inverts the ordering to a min-heap
-- Each item in the heap is `Reverse<(u64, HuffNode)>` where `u64` is the frequency
-
-**Construction algorithm:**
-
-1. For each byte with frequency > 0, create a `HuffNode::Leaf` and insert into the heap
-2. While the heap has more than 1 element:
-   - Remove the two nodes with the lowest frequency
-   - Create a `HuffNode::Internal` with those two as children and frequency = sum
-   - Reinsert into the heap
-3. The last remaining element is the tree root
+- Function signature: `pub fn build_table(root: &HuffNode) -> [Option<Vec<bool>>; 256]`
+  - Returns an array of 256 slots; index = byte value; value = `Some(code)` if the byte exists in the tree, `None` otherwise
+  - `Vec<bool>` represents the bit sequence: `false` = left (0), `true` = right (1)
+- Algorithm: DFS traversal of the tree, tracking the path taken; when a leaf is reached, store the accumulated path as the code for that byte
 
 ### How to validate
 
-Use the OpenDSA table example as test data:
+Using the OpenDSA example (C=32, D=42, E=120, K=7, L=42, M=24, U=37, Z=2):
 
-| Letter | Frequency |
-|--------|-----------|
-| C      | 32        |
-| D      | 42        |
-| E      | 120       |
-| K      | 7         |
-| L      | 42        |
-| M      | 24        |
-| U      | 37        |
-| Z      | 2         |
-
-The tree root must have frequency = sum of all = 306.
-More frequent characters (E=120) must have lower depth than less frequent ones (Z=2, K=7).
+- E (freq=120) should have the shortest code (1 bit)
+- Z (freq=2) and K (freq=7) should have the longest codes (5-6 bits)
+- All codes must be prefix-free: no code is a prefix of another
+- Encoding and decoding a known string must round-trip correctly
 
 ### TDD approach
 
-Write tests first in `tree.rs`, then implement. Suggested tests:
+Write tests first in `table.rs`, then implement. Suggested tests:
 
-- Single byte input produces a leaf root
-- Two bytes: internal root with two leaf children, frequency = sum
-- Full OpenDSA example: root with freq=306
-- Root frequency always equals the sum of all input frequencies
-- Bytes with freq=0 do not generate nodes
+- Single byte: code is empty (no bits needed — only one symbol)
+- Two bytes: one gets `[false]`, the other `[true]`
+- Higher frequency byte gets shorter code than lower frequency byte (OpenDSA data)
+- All bytes present in the tree have a non-None entry
+- Bytes absent from the tree have a None entry
+- Prefix-free property: no code in the table is a prefix of another
 
 ---
 

@@ -1,5 +1,6 @@
 mod cli;
 mod frequency;
+mod tree;
 
 use std::fs;
 
