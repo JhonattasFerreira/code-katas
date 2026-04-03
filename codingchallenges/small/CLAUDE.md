@@ -37,20 +37,27 @@ ccli compress test.txt -o test.huff
 ccli decompress test.huff -o result.txt
 ```
 
+With `cargo run`:
+
+```sh
+~/.cargo/bin/cargo run -- compress test.txt -o test.huff
+~/.cargo/bin/cargo run -- decompress test.huff -o result.txt
+```
+
 ---
 
 ## Module structure
 
 ```text
 src/
-├── main.rs        — entry point, CLI wiring, file reading
+├── main.rs        — entry point, CLI wiring, compress/decompress dispatch
 ├── cli.rs         — argument parsing (parse_args)
 ├── frequency.rs   — byte frequency counting
 ├── tree.rs        — HuffNode, tree construction
 ├── table.rs       — prefix-code table generation
 ├── bits.rs        — BitWriter and BitReader
-├── encoder.rs     — compression: header + data (TODO)
-└── decoder.rs     — decompression (TODO)
+├── encoder.rs     — compression: header + data
+└── decoder.rs     — decompression
 ```
 
 ---
@@ -104,11 +111,34 @@ src/
 - No padding metadata returned — the encoder stores the original file size in the header; the decoder stops by byte count, not bit count
 - 9 tests passing, covering: empty writer, 8-bit flush, MSB-first order, partial byte padding, 16-bit output, empty reader, MSB-first reading, exhaustion, round-trip
 
-### Total tests: 38 passing, 0 failing
+**`encoder.rs`** — `pub fn encode(data: &[u8]) -> Vec<u8>`
+
+- Counts frequencies, builds tree and code table, then serializes:
+  - 8 bytes: original file size (`u64` LE)
+  - 2 bytes: number of distinct bytes (`u16` LE)
+  - N × 9 bytes: `(byte: u8, freq: u64 LE)` pairs
+  - Compressed bits packed via `BitWriter`
+- Edge case: single distinct byte → 0 bits written (decoder handles via byte count)
+- 5 tests passing, covering: original size in header, entry count, entry values, empty data section for single byte, compressed size < original for skewed input
+- Validated: `test.txt` (3.3 MB) → `test.huff` (1.9 MB)
+
+**`decoder.rs`** — `pub fn decode(compressed: &[u8]) -> Vec<u8>`
+
+- Reads header to reconstruct frequency table, rebuilds Huffman tree, decodes bits via `BitReader`
+- Stops emitting bytes when `original_size` is reached (ignores padding bits)
+- Edge case: single distinct byte → emits `original_size` copies without reading any bits
+- 5 tests passing, all round-trip: short string, single byte, two bytes, all 256 byte values, skewed data
+
+**`main.rs`**
+
+- Dispatches to `encoder::encode` or `decoder::decode` based on CLI command
+- Writes result to output file with `fs::write`
+
+### Total tests: 48 passing, 0 failing
 
 ---
 
-## Next step: Step 5 — Encoder (`encoder.rs`)
+## Project complete
 
 ---
 

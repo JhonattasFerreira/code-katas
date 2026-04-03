@@ -1,6 +1,7 @@
 use std::cmp::Reverse;
 use std::collections::BinaryHeap;
 
+#[allow(dead_code)]
 pub enum HuffNode {
     Leaf {
         byte: u8,
@@ -14,6 +15,7 @@ pub enum HuffNode {
 }
 
 impl HuffNode {
+    #[cfg(test)]
     pub fn freq(&self) -> u64 {
         match self {
             HuffNode::Leaf { freq, .. } => *freq,

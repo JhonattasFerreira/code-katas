@@ -1,5 +1,7 @@
 mod bits;
 mod cli;
+mod decoder;
+mod encoder;
 mod frequency;
 mod table;
 mod tree;
@@ -25,16 +27,13 @@ fn main() {
         }
     };
 
-    let freq = frequency::count(&data);
+    let result = match parsed.command {
+        cli::Command::Compress => encoder::encode(&data),
+        cli::Command::Decompress => decoder::decode(&data),
+    };
 
-    for (byte, count) in freq.iter().enumerate() {
-        if *count > 0 {
-            let display = if (byte as u8).is_ascii_graphic() {
-                format!("'{}'", byte as u8 as char)
-            } else {
-                format!("0x{:02X}", byte)
-            };
-            println!("{:>6}: {}", display, count);
-        }
+    if let Err(e) = fs::write(&parsed.output, &result) {
+        eprintln!("Error: could not write file \"{}\": {}", parsed.output, e);
+        std::process::exit(1);
     }
 }
