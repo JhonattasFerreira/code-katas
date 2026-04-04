@@ -8,8 +8,10 @@ Each folder at the root represents a different challenge platform. Navigate into
 
 ```text
 code-katas/
-└── codingchallenges/   # https://codingchallenges.fyi/
-    └── ccwc/
+├── codingchallenges/   # https://codingchallenges.fyi/
+│   └── ccwc/
+└── the-nature-of-code/ # https://natureofcode.com/
+    └── walker/
 ```
 
 ## Platforms
@@ -17,6 +19,7 @@ code-katas/
 | Platform | Description |
 | -------- | ----------- |
 | [Coding Challenges](codingchallenges/) | Real-world tools built from scratch — CLI utilities, servers, databases, and more |
+| [The Nature of Code](the-nature-of-code/) | Simulations of natural phenomena — noise, physics, autonomous agents, and more |
 
 ---
 
@@ -30,8 +33,10 @@ Cada pasta na raiz representa uma plataforma diferente de desafios. Entre na pas
 
 ```text
 code-katas/
-└── codingchallenges/   # https://codingchallenges.fyi/
-    └── ccwc/
+├── codingchallenges/   # https://codingchallenges.fyi/
+│   └── ccwc/
+└── the-nature-of-code/ # https://natureofcode.com/
+    └── walker/
 ```
 
 ### Plataformas
@@ -39,3 +44,4 @@ code-katas/
 | Plataforma | Descrição |
 | ---------- | --------- |
 | [Coding Challenges](codingchallenges/) | Ferramentas reais construídas do zero — utilitários CLI, servidores, bancos de dados, e mais |
+| [The Nature of Code](the-nature-of-code/) | Simulações de fenômenos naturais — ruído, física, agentes autônomos, e mais |
