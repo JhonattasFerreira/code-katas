@@ -1,0 +1,37 @@
+use macroquad::math::Vec2;
+use std::f32::consts::FRAC_PI_4;
+
+pub const BALL_SIZE: f32 = 0.02;
+pub const BALL_SPEED: f32 = 0.5;
+pub const BALL_SPEED_INCREASE_FACTOR: f32 = 1.05;
+pub const BALL_MAX_SPEED: f32 = BALL_SPEED * 2.0;
+pub const MAX_BOUNCE_ANGLE: f32 = FRAC_PI_4;
+pub const PADDLE_WIDTH: f32 = 0.02;
+pub const PADDLE_HEIGHT: f32 = 0.15;
+pub const PADDLE_SIZE: Vec2 = Vec2::new(PADDLE_WIDTH, PADDLE_HEIGHT);
+pub const PADDLE_SPEED: f32 = 0.6;
+pub const PADDLE_MARGIN: f32 = 0.02;
+pub const AI_DEADZONE: f32 = 0.01; // ~1 frame of movement at 60fps at the default PADDLE_SPEED
+pub const POINTS_TO_WIN: u32 = 3;
+pub const WINNER_MESSAGE_DURATION: f32 = 2.0;
+pub const SERVE_DELAY_DURATION: f32 = 1.0;
+pub const CENTER_LINE_DASH_COUNT: usize = 20;
+pub const CENTER_LINE_WIDTH: f32 = 0.005;
+pub const BUTTON_WIDTH: f32 = 0.2;
+pub const BUTTON_HEIGHT: f32 = 0.1;
+pub const BUTTON_SIZE: Vec2 = Vec2::new(BUTTON_WIDTH, BUTTON_HEIGHT);
+pub const START_BUTTON_MARKER_SIZE: f32 = BALL_SIZE;
+pub const START_BUTTON_MARKER_LAP_DURATION: f32 = 2.0;
+pub const CONTROLS_FONT_SIZE: f32 = 0.035;
+pub const CONTROLS_MARGIN_BELOW_BUTTON: f32 = 0.04;
+pub const CREDIT_FONT_SIZE: f32 = 0.025;
+pub const CREDIT_MARGIN: f32 = 0.02;
+pub const SCORE_Y_FRACTION: f32 = 0.0667;
+pub const SCORE_FONT_SIZE: f32 = 0.0667;
+pub const START_BUTTON_TEXT_FONT_SIZE: f32 = 0.05;
+pub const WINNER_MESSAGE_Y_FRACTION: f32 = 0.5;
+pub const WINNER_MESSAGE_FONT_SIZE: f32 = 0.0833;
+pub const SERVE_COUNTDOWN_Y_FRACTION: f32 = 0.4;
+pub const SERVE_COUNTDOWN_FONT_SIZE: f32 = 0.0833;
+pub const WINDOW_WIDTH: i32 = 800;
+pub const WINDOW_HEIGHT: i32 = 600;

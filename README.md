@@ -10,6 +10,8 @@ Each folder at the root represents a different challenge platform. Navigate into
 code-katas/
 ├── codingchallenges/   # https://codingchallenges.fyi/
 │   └── ccwc/
+├── games/              # game dev learning projects
+│   └── pongzin/
 └── the-nature-of-code/ # https://natureofcode.com/
     └── walker/
 ```
@@ -19,6 +21,7 @@ code-katas/
 | Platform | Description |
 | -------- | ----------- |
 | [Coding Challenges](codingchallenges/) | Real-world tools built from scratch — CLI utilities, servers, databases, and more |
+| [Games](games/) | Games built to learn game dev concepts — game loop, collision, simple AI, and more |
 | [The Nature of Code](the-nature-of-code/) | Simulations of natural phenomena — noise, physics, autonomous agents, and more |
 
 ---
@@ -35,6 +38,8 @@ Cada pasta na raiz representa uma plataforma diferente de desafios. Entre na pas
 code-katas/
 ├── codingchallenges/   # https://codingchallenges.fyi/
 │   └── ccwc/
+├── games/              # projetos de aprendizado de game dev
+│   └── pongzin/
 └── the-nature-of-code/ # https://natureofcode.com/
     └── walker/
 ```
@@ -44,4 +49,5 @@ code-katas/
 | Plataforma | Descrição |
 | ---------- | --------- |
 | [Coding Challenges](codingchallenges/) | Ferramentas reais construídas do zero — utilitários CLI, servidores, bancos de dados, e mais |
+| [Games](games/) | Jogos construídos para aprender conceitos de game dev — game loop, colisão, IA simples, e mais |
 | [The Nature of Code](the-nature-of-code/) | Simulações de fenômenos naturais — ruído, física, agentes autônomos, e mais |
