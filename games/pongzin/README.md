@@ -25,6 +25,24 @@ cargo test
 
 Covers the pure logic: AABB collision detection, bounce-angle calculation, scoring/win rules, CPU AI deadzone, and menu button point-in-rectangle/marker-position geometry. This logic uses macroquad types (`Vec2`) but has no I/O dependency, so it's testable in isolation.
 
+## Running on the web
+
+macroquad targets `wasm32-unknown-unknown` out of the box, no code changes needed.
+
+```bash
+rustup target add wasm32-unknown-unknown
+cargo build --target wasm32-unknown-unknown --release
+cp target/wasm32-unknown-unknown/release/pongzin.wasm web/pongzin.wasm
+```
+
+Then serve `web/` over HTTP (wasm won't load from `file://`) and open it in a browser:
+
+```bash
+cd web && python3 -m http.server 8080
+```
+
+`web/index.html` and `web/mq_js_bundle.js` (macroquad's JS loader) are checked into the repo; `web/pongzin.wasm` is a build artifact and is gitignored — rebuild it with the steps above.
+
 ---
 
 ## Architecture
@@ -102,6 +120,24 @@ cargo test
 ```
 
 Cobre a lógica pura: detecção de colisão AABB, cálculo de ângulo de rebote, regras de pontuação/vitória, deadzone da IA da CPU, e geometria de ponto-em-retângulo/posição do marcador do botão do menu. Essa lógica usa tipos do macroquad (`Vec2`), mas não depende de I/O, então é testável isoladamente.
+
+### Rodando na web
+
+O macroquad já tem suporte nativo ao target `wasm32-unknown-unknown`, sem precisar mudar nada no código.
+
+```bash
+rustup target add wasm32-unknown-unknown
+cargo build --target wasm32-unknown-unknown --release
+cp target/wasm32-unknown-unknown/release/pongzin.wasm web/pongzin.wasm
+```
+
+Depois é só servir `web/` via HTTP (wasm não carrega em `file://`) e abrir no navegador:
+
+```bash
+cd web && python3 -m http.server 8080
+```
+
+`web/index.html` e `web/mq_js_bundle.js` (o loader JS do macroquad) estão versionados no repositório; `web/pongzin.wasm` é artefato de build e está no .gitignore — recompile com os passos acima.
 
 ---
 
